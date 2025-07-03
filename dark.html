@@ -1,0 +1,26 @@
+<!-- Dark Mode Toggle -->
+<div class="content-box">
+  <h3>🌓 Theme</h3>
+  <label style="display: flex; align-items: center; gap: 0.5rem;">
+    <input type="checkbox" id="darkToggle" />
+    Toggle Dark Mode
+  </label>
+</div>
+
+<script>
+  const toggle = document.getElementById("darkToggle");
+  toggle.addEventListener("change", () => {
+    document.body.classList.toggle("dark-theme");
+  });
+</script>
+
+<style>
+  .dark-theme {
+    background-color: #121212;
+    color: white;
+  }
+  .dark-theme .card {
+    background-color: #222;
+    color: white;
+  }
+</style>
