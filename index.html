@@ -1,36 +1,488 @@
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="tab active"><i class="fas fa-chart-pie"></i> Dashboard</div>
-  <div class="tab"><i class="fas fa-users"></i> Users</div>
-  <div class="tab"><i class="fas fa-chart-line"></i> Reports</div>
-  <div class="tab"><i class="fas fa-cogs"></i> Settings</div>
-  <div class="tab"><i class="fas fa-envelope"></i> Messages</div>
-  <div class="tab"><i class="fas fa-bell"></i> Notifications</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analytics Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-  <button class="logout-btn">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
-</div>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
 
-<!-- Header -->
-<div class="header">
-  <div class="header-left"><h2>📊 Analytics</h2></div>
-  <div class="header-center"><input type="text" placeholder="Search..." class="search-bar" /></div>
-  <div class="header-right">
-    <i class="fas fa-bell"></i>
-    <i class="fas fa-envelope"></i>
-    <i class="fas fa-cog"></i>
-    <div class="profile"><img src="https://i.pravatar.cc/40?img=3" alt="Profile" /></div>
+    .sidebar {
+      width: 20vw;
+      height: 100vh;
+      background-color: black;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 2rem;
+    }
+
+    .tab {
+      width: 100%;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .tab:hover {
+      background-color: #1a1a1a;
+    }
+
+    .tab.active {
+      background-color: #333;
+    }
+
+    .tab.logout {
+      color: red;
+      margin-top: auto;
+      border-top: 1px solid #444;
+    }
+
+    .main {
+      flex: 1;
+      margin: 2rem;
+      background: radial-gradient(circle, white, skyblue, lightgreen);
+      border-radius: 20px;
+      padding: 2rem;
+      overflow: auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 1rem 2rem;
+      margin-bottom: 2rem;
+      color: black;
+    }
+
+    .header-left h2 {
+      margin: 0;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-bar {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      width: 60%;
+      max-width: 400px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .header-right i {
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .profile img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      border: 2px solid white;
+      object-fit: cover;
+    }
+
+    .container-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 1.5rem;
+    }
+
+    .content-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      padding: 1rem 2rem;
+      min-height: 200px;
+      color: #222;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .card {
+      background-color: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card i {
+      font-size: 1.5rem;
+      color: #007acc;
+    }
+
+    .card .label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .card .value {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .card .last-week {
+      font-size: 0.85rem;
+      color: gray;
+    }
+
+    .histogram-container, .satisfaction-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 180px;
+      margin-top: 1rem;
+    }
+
+    .bar-column, .vbar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 50px;
+    }
+
+    .bar, .vfill {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .bar { height: 100px; }
+
+    .vfill { height: 100px; }
+
+    .bar-column label, .vbar label {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .pie-chart {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: conic-gradient(#4caf50 0% 40%, #2196f3 40% 70%, #ff9800 70% 90%, #f44336 90% 100%);
+      margin: 1rem auto;
+      position: relative;
+    }
+
+    .pie-chart::after {
+      content: '';
+      position: absolute;
+      top: 25%;
+      left: 25%;
+      width: 50%;
+      height: 50%;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .legend {
+      font-size: 0.85rem;
+      padding-left: 1rem;
+    }
+
+    .legend li {
+      margin: 0.3rem 0;
+    }
+
+    .legend span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+    }
+
+    .line-chart {
+      position: relative;
+      height: 200px;
+      border-left: 2px solid #444;
+      border-bottom: 2px solid #444;
+      margin-top: 1rem;
+    }
+
+    .line-point {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: #007bff;
+      border-radius: 50%;
+      transform: translate(-50%, 50%);
+    }
+
+    .donut {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: conic-gradient(#4caf50 0% 40%, #2196f3 40% 70%, #ff9800 70% 90%, #f44336 90% 100%);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .donut::after {
+      content: '';
+      position: absolute;
+      top: 25%;
+      left: 25%;
+      width: 50%;
+      height: 50%;
+      background-color: white;
+      border-radius: 50%;
+    }
+
+    .center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+      color: #333;
+    }
+
+    .stack-bar {
+      display: flex;
+      height: 40px;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .multi-ring {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: auto;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 10px solid transparent;
+    }
+
+    .ring1 {
+      width: 120px;
+      height: 120px;
+      border-top-color: #4caf50;
+    }
+
+    .ring2 {
+      width: 90px;
+      height: 90px;
+      top: 15px;
+      left: 15px;
+      border-top-color: #2196f3;
+    }
+
+    .ring3 {
+      width: 60px;
+      height: 60px;
+      top: 30px;
+      left: 30px;
+      border-top-color: #ff9800;
+    }
+
+    .progress-circle {
+      width: 120px;
+      margin: auto;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+    }
+
+    .circle-bg {
+      fill: none;
+      stroke: #eee;
+      stroke-width: 3.8;
+    }
+
+    .circle {
+      fill: none;
+      stroke: #4caf50;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+    }
+
+    .percentage {
+      font-size: 0.5em;
+      text-anchor: middle;
+      fill: #333;
+    }
+      
+      .logout-btn {
+  width: 90%;
+  margin: 1.5rem auto 1rem auto;
+  padding: 0.75rem;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: darkred;
+}
+    
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="tab active"><i class="fas fa-chart-pie"></i> Dashboard</div>
+    <div class="tab"><i class="fas fa-users"></i> Users</div>
+    <div class="tab"><i class="fas fa-chart-line"></i> Reports</div>
+    <div class="tab"><i class="fas fa-cogs"></i> Settings</div>
+    <div class="tab"><i class="fas fa-envelope"></i> Messages</div>
+    <div class="tab"><i class="fas fa-bell"></i> Notifications</div>
+    
+    <button class="logout-btn">
+  <i class="fas fa-sign-out-alt"></i> Logout
+</button>
+
+
   </div>
-</div>
 
-<!-- Overview Cards -->
-<div class="content-box">
-  <h3>📈 Overview</h3>
-  <div class="card-grid">
-    <div class="card"><i class="fas fa-dollar-sign"></i><div class="label">Total Revenue</div><div class="value">$24,000</div><div class="last-week">(Last: $21,000)</div></div>
-    <div class="card"><i class="fas fa-coins"></i><div class="label">Net Profit</div><div class="value">$8,500</div><div class="last-week">(Last: $7,800)</div></div>
-    <div class="card"><i class="fas fa-clock"></i><div class="label">Qty Sold</div><div class="value">1,250</div><div class="last-week">(Last: 1,100)</div></div>
-    <div class="card"><i class="fas fa-chart-line"></i><div class="label">Growth</div><div class="value">12%</div><div class="last-week">(Last: 9%)</div></div>
+  <div class="main">
+    <div class="header">
+      <div class="header-left"><h2>📊 Analytics</h2></div>
+      <div class="header-center"><input type="text" placeholder="Search..." class="search-bar" /></div>
+      <div class="header-right">
+        <i class="fas fa-bell"></i>
+        <i class="fas fa-envelope"></i>
+        <i class="fas fa-cog"></i>
+        <div class="profile"><img src="https://i.pravatar.cc/40?img=3" alt="Profile" /></div>
+      </div>
+    </div>
+
+    <div class="container-grid">
+      <div class="content-box">
+        <h3>📈 Overview</h3>
+        <div class="card-grid">
+          <div class="card"><i class="fas fa-dollar-sign"></i><div class="label">Total Revenue</div><div class="value">$24,000</div><div class="last-week">(Last: $21,000)</div></div>
+          <div class="card"><i class="fas fa-coins"></i><div class="label">Net Profit</div><div class="value">$8,500</div><div class="last-week">(Last: $7,800)</div></div>
+          <div class="card"><i class="fas fa-clock"></i><div class="label">Qty Sold</div><div class="value">1,250</div><div class="last-week">(Last: 1,100)</div></div>
+          <div class="card"><i class="fas fa-chart-line"></i><div class="label">Growth</div><div class="value">12%</div><div class="last-week">(Last: 9%)</div></div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>🎯 Goal Completion</h3>
+        <div class="pie-chart"></div>
+        <ul class="legend">
+          <li><span style="background:#4caf50;"></span> Marketing (40%)</li>
+          <li><span style="background:#2196f3;"></span> UX/UI (30%)</li>
+          <li><span style="background:#ff9800;"></span> Expansion (20%)</li>
+          <li><span style="background:#f44336;"></span> Payment Gateway (10%)</li>
+        </ul>
+      </div>
+
+      <div class="content-box">
+        <h3>📈 Weekly Sales Trend</h3>
+        <div class="line-chart">
+          <div class="line-point" style="left: 0%; bottom: 20%;"></div>
+          <div class="line-point" style="left: 20%; bottom: 40%;"></div>
+          <div class="line-point" style="left: 40%; bottom: 60%;"></div>
+          <div class="line-point" style="left: 60%; bottom: 80%;"></div>
+          <div class="line-point" style="left: 80%; bottom: 60%;"></div>
+          <div class="line-point" style="left: 100%; bottom: 75%;"></div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>💰 Revenue Split</h3>
+        <div class="donut">
+          <div class="center-text">$100K</div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>📊 Quarterly Sales</h3>
+        <div class="stack-bar">
+          <div class="segment" style="width: 40%; background-color: #4caf50;">Q1</div>
+          <div class="segment" style="width: 30%; background-color: #2196f3;">Q2</div>
+          <div class="segment" style="width: 20%; background-color: #ff9800;">Q3</div>
+          <div class="segment" style="width: 10%; background-color: #f44336;">Q4</div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>🌐 Customer Sources</h3>
+        <div class="multi-ring">
+          <div class="ring ring1"></div>
+          <div class="ring ring2"></div>
+          <div class="ring ring3"></div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>⏳ Task Progress</h3>
+        <div class="progress-circle">
+          <svg viewBox="0 0 36 36">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path class="circle" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <text x="18" y="20.35" class="percentage">75%</text>
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</body>
+</html>
